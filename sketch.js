@@ -27,7 +27,8 @@ let playerPosition;
 let playerDirection;
 let playerSize = 20
 const fov = 80;
-const raySpacing = 5;
+const raySpacing = 0.1;
+const maxRayLength = 1000
 
 function drawMap() {
 	background(0);
@@ -56,20 +57,23 @@ function drawRaysAndPlayer() {
 		
 		let max = 0
 		// console.log(currentRayEnd)
-		while (!tileAt(currentRayEnd.x + playerPosition.x, currentRayEnd.y + playerPosition.y) != 0 && max < 1000) {
+		while (!tileAt(currentRayEnd.x + playerPosition.x, currentRayEnd.y + playerPosition.y) != 0 && max < maxRayLength) {
 			currentRayEnd.x += currentRayDirection.x;
 			currentRayEnd.y += currentRayDirection.y;
+			max++
 		}
-		
+		stroke("lightblue");
 		line(
 			playerPosition.x,
 			playerPosition.y,
 			playerPosition.x + currentRayEnd.x,
 			playerPosition.y + currentRayEnd.y
-			);
-			noStroke()
+		);
+		noStroke()
+		if (!(raySpacing < 1)) {
 			circle(currentRayEnd.x + playerPosition.x, currentRayEnd.y + playerPosition.y, 6)
-			stroke("lightblue");
+		}
+			
 		}
 		circle(playerPosition.x, playerPosition.y, playerSize);
 }
