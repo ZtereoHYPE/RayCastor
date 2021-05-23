@@ -27,14 +27,14 @@ let playerPosition;
 let playerDirection;
 let playerSize = 20
 const fov = 80;
-const raySpacing = 0.1;
+const raySpacing = 0.3;
 const maxRayLength = 1000
 
 function drawMap() {
 	background(0);
-	noStroke()
-	for (y = 0; y <= 500; y += tileSize) {
-		for (x = 0; x <= 500; x += tileSize) {
+	stroke('black')
+	for (y = 0; y < 500; y += tileSize) {
+		for (x = 0; x < 500; x += tileSize) {
 			if (tileAt(x, y)) {
 				fill(colourMap[tileAt(x, y)]);
 				square(x, y, tileSize);
@@ -43,25 +43,28 @@ function drawMap() {
 	}
 }
 
-function drawRaysAndPlayer() {
+function raycast() {
 	fill("green");
-	
+
 	for (let angle = -(fov / 2); angle <= fov / 2; angle += raySpacing) {
 		let currentRayDirection = playerDirection.copy()
 		currentRayDirection.rotate(radians(angle));
-		
+
 		let currentRayEnd = {
 			x: currentRayDirection.x,
 			y: currentRayDirection.y
 		}
-		
+
 		let max = 0
-		// console.log(currentRayEnd)
+
 		while (!tileAt(currentRayEnd.x + playerPosition.x, currentRayEnd.y + playerPosition.y) != 0 && max < maxRayLength) {
 			currentRayEnd.x += currentRayDirection.x;
 			currentRayEnd.y += currentRayDirection.y;
 			max++
 		}
+
+		draw3D(currentRayEnd, angle)
+
 		stroke("lightblue");
 		line(
 			playerPosition.x,
@@ -70,60 +73,79 @@ function drawRaysAndPlayer() {
 			playerPosition.y + currentRayEnd.y
 		);
 		noStroke()
-		if (!(raySpacing < 1)) {
-			circle(currentRayEnd.x + playerPosition.x, currentRayEnd.y + playerPosition.y, 6)
-		}
-			
-		}
-		circle(playerPosition.x, playerPosition.y, playerSize);
+		// if (!(raySpacing < 1)) {
+		// 	circle(currentRayEnd.x + playerPosition.x, currentRayEnd.y + playerPosition.y, 6)
+		// }
+
+	}
+}
+
+function draw3D(currentRayEnd, angle) {
+	let rayLength = getRayLength(playerPosition, { x: currentRayEnd.x + playerPosition.x, y: currentRayEnd.y + playerPosition.y })
+	fill(colourMap[tileAt(currentRayEnd.x + playerPosition.x , currentRayEnd.y + playerPosition.y )]);
+	rect(250 + ((fov - angle) * 500) / fov, 250 - ((tileSize * windowHeight) / (rayLength * cos(radians(angle)))) / 2, 500 / (fov / raySpacing) + 1, (tileSize * windowHeight) / (rayLength * cos(radians(angle))))
 }
 
 function movePlayer() {
-	/* 	NOTE: This system to not make the player enter the walls is not ideal:
+	/* 	
+		NOTE: This system to not make the player enter the walls is not ideal:
 		It currently allows player to pass slightly through a wall.
 		The ideal fix would be to set a potential location and to check a bunch of points around the player to be checked each time for collision.
 	*/
 
 	// up
 	if (keyIsDown(87)) {
-		if (!tileAt(playerPosition.x, playerPosition.y - 2 - playerSize/2)) {
+		if (!tileAt(playerPosition.x, playerPosition.y - 2 - playerSize / 2)) {
 			playerPosition.y -= 2
 		}
 	}
 
 	// down
 	if (keyIsDown(83)) {
-		if (!tileAt(playerPosition.x, playerPosition.y + 2 + playerSize/2)) {
+		if (!tileAt(playerPosition.x, playerPosition.y + 2 + playerSize / 2)) {
 			playerPosition.y += 2
 		}
 	}
 
 	// left
 	if (keyIsDown(65)) {
-		if (!tileAt(playerPosition.x - 2 - playerSize/2, playerPosition.y)) {
+		if (!tileAt(playerPosition.x - 2 - playerSize / 2, playerPosition.y)) {
 			playerPosition.x -= 2
 		}
 	}
 
 	// right
 	if (keyIsDown(68)) {
-		if (!tileAt(playerPosition.x + 2 + playerSize/2, playerPosition.y)) {
+		if (!tileAt(playerPosition.x + 2 + playerSize / 2, playerPosition.y)) {
 			playerPosition.x += 2
 		}
 	}
 }
 
 function setup() {
-	createCanvas(500, 500);
+	createCanvas(1000, 500);
 	playerPosition = createVector(330, 272);
 	playerDirection = createVector(0, 1);
 }
 
 function draw() {
+	background('#ffffff')
 	playerDirection.x = mouseX - playerPosition.x;
 	playerDirection.y = mouseY - playerPosition.y;
 	playerDirection.normalize();
 	drawMap();
 	movePlayer();
-	drawRaysAndPlayer();
+	raycast();
+	fill('green')
+	circle(playerPosition.x, playerPosition.y, playerSize);
+}
+
+function checkIllegalPosition() {
+
+}
+
+function getRayLength(object1, object2) {
+	let differenceX = object1.x - object2.x;
+	let differenceY = object1.y - object2.y;
+	return Math.sqrt(differenceX * differenceX + differenceY * differenceY);
 }
