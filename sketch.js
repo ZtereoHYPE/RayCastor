@@ -26,7 +26,7 @@ function tileAt(x, y) {
 let playerPosition;
 let playerDirection;
 let playerSize = 20
-const fov = 80;
+const fov = 50;
 const raySpacing = 0.3;
 const maxRayLength = 1000
 
@@ -44,8 +44,6 @@ function drawMap() {
 }
 
 function raycast() {
-	fill("green");
-
 	for (let angle = -(fov / 2); angle <= fov / 2; angle += raySpacing) {
 		let currentRayDirection = playerDirection.copy()
 		currentRayDirection.rotate(radians(angle));
@@ -81,6 +79,7 @@ function raycast() {
 }
 
 function draw3D(currentRayEnd, angle) {
+	
 	let rayLength = getRayLength(playerPosition, { x: currentRayEnd.x + playerPosition.x, y: currentRayEnd.y + playerPosition.y })
 	fill(colourMap[tileAt(currentRayEnd.x + playerPosition.x , currentRayEnd.y + playerPosition.y )]);
 	rect(250 + ((fov - angle) * 500) / fov, 250 - ((tileSize * windowHeight) / (rayLength * cos(radians(angle)))) / 2, 500 / (fov / raySpacing) + 1, (tileSize * windowHeight) / (rayLength * cos(radians(angle))))
@@ -124,17 +123,19 @@ function movePlayer() {
 
 function setup() {
 	createCanvas(1000, 500);
+	background(0);
 	playerPosition = createVector(330, 272);
 	playerDirection = createVector(0, 1);
 }
 
 function draw() {
-	background('#ffffff')
 	playerDirection.x = mouseX - playerPosition.x;
 	playerDirection.y = mouseY - playerPosition.y;
 	playerDirection.normalize();
 	drawMap();
 	movePlayer();
+	fill('gray')
+	rect(500, 250, 500, 250)
 	raycast();
 	fill('green')
 	circle(playerPosition.x, playerPosition.y, playerSize);
