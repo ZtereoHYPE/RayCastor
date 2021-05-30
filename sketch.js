@@ -2,7 +2,7 @@ const level = [
 	1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 	1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
 	1, 0, 0, 3, 0, 0, 5, 1, 0, 1,
-	1, 0, 4, 4, 0, 0, 0, 1, 0, 1,
+	1, 0, 0, 4, 0, 0, 0, 1, 0, 1,
 	1, 0, 1, 0, 0, 0, 1, 4, 0, 1,
 	1, 0, 2, 2, 0, 0, 0, 0, 0, 1,
 	1, 0, 0, 0, 0, 0, 0, 0, 3, 1,
@@ -23,10 +23,13 @@ const tileSize = 50;
 function tileAt(x, y) {
 	return level[floor(y / tileSize) * mapSize + floor(x / tileSize)];
 }
+function tileSide(x, y) {
+
+}
 let playerPosition;
 let playerDirection;
 let playerSize = 20
-const fov = 50;
+const fov = 70;
 const raySpacing = 0.3;
 const maxRayLength = 1000
 
@@ -71,10 +74,6 @@ function raycast() {
 			playerPosition.y + currentRayEnd.y
 		);
 		noStroke()
-		// if (!(raySpacing < 1)) {
-		// 	circle(currentRayEnd.x + playerPosition.x, currentRayEnd.y + playerPosition.y, 6)
-		// }
-
 	}
 }
 
@@ -82,7 +81,7 @@ function draw3D(currentRayEnd, angle) {
 	
 	let rayLength = getRayLength(playerPosition, { x: currentRayEnd.x + playerPosition.x, y: currentRayEnd.y + playerPosition.y })
 	fill(colourMap[tileAt(currentRayEnd.x + playerPosition.x , currentRayEnd.y + playerPosition.y )]);
-	rect(250 + ((fov - angle) * 500) / fov, 250 - ((tileSize * windowHeight) / (rayLength * cos(radians(angle)))) / 2, 500 / (fov / raySpacing) + 1, (tileSize * windowHeight) / (rayLength * cos(radians(angle))))
+	rect(1550 - ((fov - angle) * 700) / fov, 250 - ((tileSize * windowHeight) / (rayLength * cos(radians(angle)))) / 2, 500 / (fov / raySpacing) + 1, (tileSize * windowHeight) / (rayLength * cos(radians(angle))))
 }
 
 function movePlayer() {
@@ -122,7 +121,7 @@ function movePlayer() {
 }
 
 function setup() {
-	createCanvas(1000, 500);
+	createCanvas(1200, 500);
 	background(0);
 	playerPosition = createVector(330, 272);
 	playerDirection = createVector(0, 1);
@@ -134,8 +133,11 @@ function draw() {
 	playerDirection.normalize();
 	drawMap();
 	movePlayer();
-	fill('gray')
-	rect(500, 250, 500, 250)
+	noStroke()
+	fill('#11dd11')
+	rect(500, 250, 700, 250)
+	fill('#1199dd')
+	rect(500, 0, 700, 250)
 	raycast();
 	fill('green')
 	circle(playerPosition.x, playerPosition.y, playerSize);
