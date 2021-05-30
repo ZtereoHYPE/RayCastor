@@ -2,11 +2,11 @@ const level = [
 	1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 	1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
 	1, 0, 0, 3, 0, 0, 5, 1, 0, 1,
-	1, 0, 0, 4, 0, 0, 0, 1, 0, 1,
+	1, 0, 0, 3, 0, 0, 0, 1, 0, 1,
 	1, 0, 1, 0, 0, 0, 1, 4, 0, 1,
 	1, 0, 2, 2, 0, 0, 0, 0, 0, 1,
 	1, 0, 0, 0, 0, 0, 0, 0, 3, 1,
-	1, 0, 0, 1, 0, 0, 0, 3, 3, 1,
+	1, 0, 0, 0, 0, 0, 0, 3, 3, 1,
 	1, 0, 0, 0, 0, 0, 0, 0, 3, 1,
 	1, 1, 1, 1, 1, 1, 1, 1, 1, 1
 ];
@@ -55,7 +55,7 @@ let playerDirection;
 let playerSize = 20
 const fov = 70;
 const raySpacing = 0.1;
-const maxRayLength = 1000
+const maxRayLength = 550
 
 function drawMap() {
 	background(0);
@@ -106,12 +106,12 @@ function draw3D(currentRayEnd, angle) {
 	let rayLength = getRayLength(playerPosition, { x: currentRayEnd.x + playerPosition.x, y: currentRayEnd.y + playerPosition.y })
 	if (tileAt(currentRayEnd.x + playerPosition.x, currentRayEnd.y + playerPosition.y + 1) && tileAt(currentRayEnd.x + playerPosition.x, currentRayEnd.y + playerPosition.y - 1)) {
 		let colour = colourMap[tileAt(currentRayEnd.x + playerPosition.x , currentRayEnd.y + playerPosition.y)]
-		fill(color(colour.h, colour.s, colour.b));
+		fill(color(colour.h, colour.s, colour.b - rayLength**2/1000));
 	} else {
 		let colour = colourMap[tileAt(currentRayEnd.x + playerPosition.x , currentRayEnd.y + playerPosition.y)]
-		fill(color(colour.h, colour.s, colour.b - 40))
+		fill(color(colour.h, colour.s, colour.b - 40 - rayLength**2/1000))
 	}
-	rect(1550 - ((fov - angle) * 700) / fov, 250 - ((tileSize * windowHeight) / (rayLength * cos(radians(angle)))) / 2, 500 / (fov / raySpacing) + 1, (tileSize * windowHeight) / (rayLength * cos(radians(angle))))
+	rect(1550 - ((fov - angle) * 700) / fov, 250 - ((tileSize * windowHeight) / (rayLength * cos(radians(angle)))) / 2, 700 / (fov / raySpacing) + 1, (tileSize * windowHeight) / (rayLength * cos(radians(angle))))
 }
 
 function movePlayer() {
@@ -183,3 +183,15 @@ function getRayLength(object1, object2) {
 	let differenceY = object1.y - object2.y;
 	return Math.sqrt(differenceX * differenceX + differenceY * differenceY);
 }
+
+function gradientLine(ctx, x1, y1, x2, y2, c1, c2) {
+	const gradient = ctx.createLinearGradient(x1, y1, x2, y2);
+	gradient.addColorStop(0, c1);
+	gradient.addColorStop(1, c2);
+	ctx.strokeStyle = gradient;
+  
+	ctx.beginPath();
+	ctx.moveTo(x1, y1);
+	ctx.lineTo(x2, y2);
+	ctx.stroke();
+  }
