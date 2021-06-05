@@ -12,34 +12,34 @@ const level = [
 ];
 const colourMap = {
 	0: {
-		h:0,
-		s:0,
-		b:0
+		h: 0,
+		s: 0,
+		b: 0
 	},
 	1: {
-		h:0,
-		s:0,
-		b:256
+		h: 0,
+		s: 0,
+		b: 256
 	},
 	2: {
-		h:0,
-		s:256,
-		b:256
+		h: 0,
+		s: 256,
+		b: 256
 	},
 	3: {
-		h:37,
-		s:256,
-		b:256
+		h: 37,
+		s: 256,
+		b: 256
 	},
 	4: {
-		h:80,
-		s:230,
-		b:256
+		h: 80,
+		s: 230,
+		b: 256
 	},
 	5: {
-		h:167,
-		s:200,
-		b:256
+		h: 167,
+		s: 200,
+		b: 256
 	},
 }
 const mapSize = 10;
@@ -47,25 +47,34 @@ const tileSize = 50;
 function tileAt(x, y) {
 	return level[floor(y / tileSize) * mapSize + floor(x / tileSize)];
 }
-function tileSide(x, y) {
 
-}
 let playerPosition;
 let playerDirection;
 let playerSize = 20
 const fov = 70;
 const raySpacing = 0.1;
 const maxRayLength = 550
+const mapLocation = {
+	x: 100,
+	y: 0,
+	size: 400
+}
+const screenLocation = {
+	x: 500,
+	y: 0
+}
+
 
 function drawMap() {
-	background(0);
+	fill('black')
+	//todo make it do a square that covers background of minimap
 	stroke('black')
 	for (y = 0; y < 500; y += tileSize) {
 		for (x = 0; x < 500; x += tileSize) {
 			if (tileAt(x, y)) {
 				let colour = colourMap[tileAt(x, y)]
 				fill(color(colour.h, colour.s, colour.b));
-				square(x, y, tileSize);
+				square(((mapLocation.x + x) / (mapSize * tileSize)) * mapLocation.size, ((mapLocation.y + y) / (mapSize * tileSize)) * mapLocation.size, mapLocation.size / mapSize);
 			}
 		}
 	}
@@ -93,10 +102,10 @@ function raycast() {
 
 		stroke("lightblue");
 		line(
-			playerPosition.x,
-			playerPosition.y,
-			playerPosition.x + currentRayEnd.x,
-			playerPosition.y + currentRayEnd.y
+			((mapLocation.x + playerPosition.x) / (mapSize * tileSize)) * mapLocation.size,
+			((mapLocation.y + playerPosition.y) / (mapSize * tileSize)) * mapLocation.size,
+			((mapLocation.x + playerPosition.x) / (mapSize * tileSize)) * mapLocation.size + (currentRayEnd.x / (mapSize * tileSize)) * mapLocation.size,
+			((mapLocation.y + playerPosition.y) / (mapSize * tileSize)) * mapLocation.size + (currentRayEnd.y / (mapSize * tileSize)) * mapLocation.size
 		);
 		noStroke()
 	}
@@ -105,11 +114,11 @@ function raycast() {
 function draw3D(currentRayEnd, angle) {
 	let rayLength = getRayLength(playerPosition, { x: currentRayEnd.x + playerPosition.x, y: currentRayEnd.y + playerPosition.y })
 	if (tileAt(currentRayEnd.x + playerPosition.x, currentRayEnd.y + playerPosition.y + 1) && tileAt(currentRayEnd.x + playerPosition.x, currentRayEnd.y + playerPosition.y - 1)) {
-		let colour = colourMap[tileAt(currentRayEnd.x + playerPosition.x , currentRayEnd.y + playerPosition.y)]
-		fill(color(colour.h, colour.s, colour.b - rayLength**2/1000));
+		let colour = colourMap[tileAt(currentRayEnd.x + playerPosition.x, currentRayEnd.y + playerPosition.y)]
+		fill(color(colour.h, colour.s, colour.b - rayLength ** 2 / 1000));
 	} else {
-		let colour = colourMap[tileAt(currentRayEnd.x + playerPosition.x , currentRayEnd.y + playerPosition.y)]
-		fill(color(colour.h, colour.s, colour.b - 40 - rayLength**2/1000))
+		let colour = colourMap[tileAt(currentRayEnd.x + playerPosition.x, currentRayEnd.y + playerPosition.y)]
+		fill(color(colour.h, colour.s, colour.b - 40 - rayLength ** 2 / 1000))
 	}
 	rect(1550 - ((fov - angle) * 700) / fov, 250 - ((tileSize * windowHeight) / (rayLength * cos(radians(angle)))) / 2, 700 / (fov / raySpacing) + 1, (tileSize * windowHeight) / (rayLength * cos(radians(angle))))
 }
@@ -151,7 +160,7 @@ function movePlayer() {
 }
 
 function setup() {
-	createCanvas(1200, 500);
+	createCanvas(windowWidth, windowHeight);
 	background(0);
 	colorMode(HSB, 255);
 	playerPosition = createVector(330, 272);
@@ -159,9 +168,10 @@ function setup() {
 }
 
 function draw() {
-	playerDirection.x = mouseX - playerPosition.x;
-	playerDirection.y = mouseY - playerPosition.y;
+	playerDirection.x = mouseX - ((mapLocation.x + playerPosition.x) / (mapSize * tileSize)) * mapLocation.size;
+	playerDirection.y = mouseY - ((mapLocation.y + playerPosition.y) / (mapSize * tileSize)) * mapLocation.size;
 	playerDirection.normalize();
+	background(0);
 	drawMap();
 	movePlayer();
 	noStroke()
@@ -171,11 +181,7 @@ function draw() {
 	rect(500, 0, 700, 250)
 	raycast();
 	fill('green')
-	circle(playerPosition.x, playerPosition.y, playerSize);
-}
-
-function checkIllegalPosition() {
-
+	circle(((mapLocation.x + playerPosition.x) / (mapSize * tileSize)) * mapLocation.size, ((mapLocation.y + playerPosition.y) / (mapSize * tileSize)) * mapLocation.size, playerSize);
 }
 
 function getRayLength(object1, object2) {
@@ -183,15 +189,3 @@ function getRayLength(object1, object2) {
 	let differenceY = object1.y - object2.y;
 	return Math.sqrt(differenceX * differenceX + differenceY * differenceY);
 }
-
-function gradientLine(ctx, x1, y1, x2, y2, c1, c2) {
-	const gradient = ctx.createLinearGradient(x1, y1, x2, y2);
-	gradient.addColorStop(0, c1);
-	gradient.addColorStop(1, c2);
-	ctx.strokeStyle = gradient;
-  
-	ctx.beginPath();
-	ctx.moveTo(x1, y1);
-	ctx.lineTo(x2, y2);
-	ctx.stroke();
-  }
