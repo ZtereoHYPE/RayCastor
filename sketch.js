@@ -55,9 +55,9 @@ const fov = 70;
 const raySpacing = 0.1;
 const maxRayLength = 550
 const mapLocation = {
-	x: 100,
+	x: 0,
 	y: 0,
-	size: 400
+	size: 300
 }
 const screenLocation = {
 	x: 500,
@@ -67,8 +67,8 @@ const screenLocation = {
 
 function drawMap() {
 	fill('black')
-	//todo make it do a square that covers background of minimap
 	stroke('black')
+	rect((mapLocation.x/(tileSize*mapSize))*mapLocation.size, (mapLocation.y/(tileSize*mapSize))*mapLocation.size, mapLocation.size, mapLocation.size)
 	for (y = 0; y < 500; y += tileSize) {
 		for (x = 0; x < 500; x += tileSize) {
 			if (tileAt(x, y)) {
@@ -78,6 +78,8 @@ function drawMap() {
 			}
 		}
 	}
+	fill('green')
+	circle(((mapLocation.x + playerPosition.x) / (mapSize * tileSize)) * mapLocation.size, ((mapLocation.y + playerPosition.y) / (mapSize * tileSize)) * mapLocation.size, (playerSize/500)*mapLocation.size);
 }
 
 function raycast() {
@@ -172,16 +174,14 @@ function draw() {
 	playerDirection.y = mouseY - ((mapLocation.y + playerPosition.y) / (mapSize * tileSize)) * mapLocation.size;
 	playerDirection.normalize();
 	background(0);
-	drawMap();
 	movePlayer();
 	noStroke()
 	fill('#11dd44')
 	rect(500, 250, 700, 250)
 	fill('#1188dd')
 	rect(500, 0, 700, 250)
+	drawMap();
 	raycast();
-	fill('green')
-	circle(((mapLocation.x + playerPosition.x) / (mapSize * tileSize)) * mapLocation.size, ((mapLocation.y + playerPosition.y) / (mapSize * tileSize)) * mapLocation.size, playerSize);
 }
 
 function getRayLength(object1, object2) {
