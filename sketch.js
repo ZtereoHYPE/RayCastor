@@ -103,12 +103,25 @@ function raycast() {
 		draw3D(currentRayEnd, angle)
 
 		stroke("lightblue");
-		line(
-			((mapLocation.x + playerPosition.x) / (mapSize * tileSize)) * mapLocation.size,
-			((mapLocation.y + playerPosition.y) / (mapSize * tileSize)) * mapLocation.size,
-			((mapLocation.x + playerPosition.x) / (mapSize * tileSize)) * mapLocation.size + (currentRayEnd.x / (mapSize * tileSize)) * mapLocation.size,
-			((mapLocation.y + playerPosition.y) / (mapSize * tileSize)) * mapLocation.size + (currentRayEnd.y / (mapSize * tileSize)) * mapLocation.size
-		);
+
+		let offsets = {
+			x: mapLocation.x + playerPosition.x,
+			y: mapLocation.y + playerPosition.y
+		};
+
+		let totalSize = mapSize * tileSize;
+		let size = mapLocation.size; // avoid repetitive method calls
+
+		let x = offsets['x'] / totalSize;
+		let y = offsets['y'] / totalSize;
+
+		let x1 = x * size;
+		let y1 = y * size;
+
+		let x2 = x1 + (currentRayEnd.x / totalSize) * size;
+		let y2 = y1 + (currentRayEnd.y / totalSize) * size;
+
+		line(x1, y1, x2, y2);
 		noStroke()
 	}
 }
