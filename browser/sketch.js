@@ -10,38 +10,38 @@ const level = [
 	1, 0, 0, 0, 0, 0, 0, 0, 3, 1,
 	1, 1, 1, 1, 1, 1, 1, 1, 1, 1
 ];
-const colourMap = {
-	0: {
+const colourMap = [
+	{
 		h: 0,
 		s: 0,
 		b: 0
 	},
-	1: {
+	{
 		h: 0,
 		s: 0,
 		b: 256
 	},
-	2: {
+	{
 		h: 0,
 		s: 256,
 		b: 256
 	},
-	3: {
+	{
 		h: 37,
 		s: 256,
 		b: 256
 	},
-	4: {
+	{
 		h: 80,
 		s: 230,
 		b: 256
 	},
-	5: {
+	{
 		h: 167,
 		s: 200,
 		b: 256
 	},
-}
+]
 const mapSize = 10;
 const tileSize = 50;
 function tileAt(x, y) {
@@ -57,7 +57,7 @@ const maxRayLength = 550
 const mapLocation = {
 	x: 0,
 	y: 0,
-	size: 300
+	size: 500
 }
 const screenLocation = {
 	x: 500,
@@ -83,6 +83,7 @@ function drawMap() {
 }
 
 function raycast() {
+	drawMap()
 	for (let angle = -(fov / 2); angle <= fov / 2; angle += raySpacing) {
 		let currentRayDirection = playerDirection.copy()
 		currentRayDirection.rotate(radians(angle));
@@ -99,9 +100,9 @@ function raycast() {
 			currentRayEnd.y += currentRayDirection.y;
 			max++
 		}
-
+		
 		draw3D(currentRayEnd, angle)
-
+		
 		stroke("lightblue");
 
 		let offsets = {
@@ -112,12 +113,11 @@ function raycast() {
 		let totalSize = mapSize * tileSize;
 		let size = mapLocation.size; // avoid repetitive method calls
 
-		let x = offsets['x'] / totalSize;
+		let x = offsets['x'] / totalSize
 		let y = offsets['y'] / totalSize;
 
 		let x1 = x * size;
 		let y1 = y * size;
-
 		let x2 = x1 + (currentRayEnd.x / totalSize) * size;
 		let y2 = y1 + (currentRayEnd.y / totalSize) * size;
 
@@ -135,7 +135,7 @@ function draw3D(currentRayEnd, angle) {
 		let colour = colourMap[tileAt(currentRayEnd.x + playerPosition.x, currentRayEnd.y + playerPosition.y)]
 		fill(color(colour.h, colour.s, colour.b - 40 - rayLength ** 2 / 1000))
 	}
-	rect(1550 - ((fov - angle) * 700) / fov, 250 - ((tileSize * windowHeight) / (rayLength * cos(radians(angle)))) / 2, 700 / (fov / raySpacing) + 1, (tileSize * windowHeight) / (rayLength * cos(radians(angle))))
+	rect(250 + ((fov - angle) * 500) / fov, 250 - ((tileSize * windowHeight) / (rayLength * cos(radians(angle)))) / 2, 500 / (fov / raySpacing) + 1, (tileSize * windowHeight) / (rayLength * cos(radians(angle))))
 }
 
 function movePlayer() {
@@ -193,7 +193,7 @@ function draw() {
 	rect(500, 250, 700, 250)
 	fill('#1188dd')
 	rect(500, 0, 700, 250)
-	drawMap();
+	// drawMap();
 	raycast();
 }
 
